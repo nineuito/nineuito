@@ -50,5 +50,5 @@ I specialize in **React, TypeScript, Next.js, Redux**, and love writing clean, m
 
 ## 🐍 Contribution Snake
 <p align="center">
-  <img src="https://github.com/nineuito/nineuito/blob/output/github-contribution-grid-snake.svg" alt="snake animation" />
+  <img src="https://github.com/nineuito/nineuito/blob/output/github-contribution-grid-snake-dark.svg" alt="snake animation" />
 </p>
