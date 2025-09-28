@@ -18,6 +18,7 @@ I specialize in **React, TypeScript, Next.js, Redux**, and love writing clean, m
 ## 🌐 Socials:
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/oleh-chernov-9ab27a262/) 
 [![Email](https://img.shields.io/badge/Email-D14836?logo=gmail&logoColor=white)](mailto:oleh.chernov.fs@gmail.com)
+[![GitLab](https://img.shields.io/badge/GitLab-FCA121?logo=gitlab&logoColor=white)](https://gitlab.com/oleh.chernov.fs)
 
 ---
 
