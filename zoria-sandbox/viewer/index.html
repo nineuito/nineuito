@@ -1,0 +1,3673 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*{box-sizing:border-box}body{margin:0}img{max-width:100%}</style>
+</head>
+<body>
+<title>Реплей матчу ZORIA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#EDEFF2; --surface:#FFFFFF; --surface-2:#F4F6F9; --line:#D4DAE1;
+    --ink:#141922; --muted:#5C6774; --grid:#E1E6EC;
+    --p1:#B96B12; --p1-soft:rgba(185,107,18,.13);
+    --p2:#166273; --p2-soft:rgba(22,98,115,.13);
+    --alert:#A02F4D; --alert-soft:rgba(160,47,77,.14);
+    --shadow:0 1px 2px rgba(20,25,34,.06), 0 8px 24px -12px rgba(20,25,34,.18);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#0E1116; --surface:#151A21; --surface-2:#1B222B; --line:#2B333F;
+      --ink:#E3E8EE; --muted:#8B96A4; --grid:#222A34;
+      --p1:#EDA64F; --p1-soft:rgba(237,166,79,.16);
+      --p2:#4FB6CC; --p2-soft:rgba(79,182,204,.16);
+      --alert:#E36A8A; --alert-soft:rgba(227,106,138,.18);
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0E1116; --surface:#151A21; --surface-2:#1B222B; --line:#2B333F;
+    --ink:#E3E8EE; --muted:#8B96A4; --grid:#222A34;
+    --p1:#EDA64F; --p1-soft:rgba(237,166,79,.16);
+    --p2:#4FB6CC; --p2-soft:rgba(79,182,204,.16);
+    --alert:#E36A8A; --alert-soft:rgba(227,106,138,.18);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+    font-size:15px; line-height:1.55;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:28px 20px 56px; display:flex; flex-direction:column; gap:22px;}
+
+  .masthead{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 16px; border-bottom:2px solid var(--ink); padding-bottom:12px;}
+  h1{
+    font-family:"IBM Plex Sans Condensed",system-ui,sans-serif; font-weight:700;
+    font-size:clamp(26px,4.4vw,38px); letter-spacing:-.015em; margin:0; text-wrap:balance;
+  }
+  .sub{color:var(--muted); font-size:14px; margin:0;}
+  .meta{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap;}
+  .meta b{color:var(--ink); font-weight:500;}
+
+  .console{display:grid; grid-template-columns:minmax(260px,520px) minmax(230px,1fr); gap:20px; align-items:start; justify-content:center;}
+  @media (max-width:800px){ .console{grid-template-columns:1fr;} }
+
+  .board-cell{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:14px; box-shadow:var(--shadow);}
+  canvas{display:block; width:100%; height:auto; border-radius:3px;}
+
+  .rail{display:flex; flex-direction:column; gap:12px;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:12px 14px;}
+  .card.lead{border-left:3px solid var(--accent,var(--line));}
+  .who{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .name{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:700; font-size:17px; letter-spacing:.01em;}
+  .score{font-family:"IBM Plex Mono",monospace; font-size:30px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1; color:var(--accent);}
+  .row{display:flex; justify-content:space-between; gap:10px; font-size:12.5px; color:var(--muted); margin-top:6px;}
+  .row span:last-child{font-family:"IBM Plex Mono",monospace; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .pill{
+    display:inline-flex; align-items:center; gap:6px; margin-top:9px; padding:3px 9px; border-radius:99px;
+    font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.04em; text-transform:uppercase;
+    background:var(--surface-2); color:var(--muted); border:1px solid var(--line);
+  }
+  .pill.order{background:var(--alert-soft); color:var(--alert); border-color:transparent; font-weight:500;}
+  .pill i{width:6px; height:6px; border-radius:99px; background:currentColor; font-style:normal;}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.11em;
+    text-transform:uppercase; color:var(--muted); margin:0 0 8px;
+  }
+  .legend{font-size:12.5px; color:var(--muted); display:flex; flex-direction:column; gap:6px;}
+  .legend div{display:flex; align-items:center; gap:8px;}
+  .sw{width:12px; height:12px; border-radius:3px; flex:none;}
+  .sw.res{border-radius:0; transform:rotate(45deg); width:9px; height:9px; border:1.5px solid var(--muted);}
+
+  .track-block{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:14px 16px 16px;}
+  .track{position:relative; cursor:pointer; user-select:none; touch-action:none;}
+  .lane{display:flex; gap:1px; height:15px; margin-bottom:2px;}
+  .lane b{flex:1 1 0; border-radius:1px; background:var(--cell);}
+  .head{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); pointer-events:none; border-radius:2px;}
+  .ticks{display:flex; justify-content:space-between; font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--muted); margin-top:5px;}
+
+  .transport{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  button,select{font:inherit; color:var(--ink); background:var(--surface-2); border:1px solid var(--line); border-radius:5px; padding:6px 12px; cursor:pointer;}
+  button:hover,select:hover{border-color:var(--muted);}
+  button:focus-visible,select:focus-visible,.track:focus-visible{outline:2px solid var(--p2); outline-offset:2px;}
+  #play{min-width:124px; font-weight:500;}
+  .tickno{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; margin-left:auto;}
+  .tickno b{color:var(--ink); font-weight:600;}
+
+  .note{font-size:13.5px; color:var(--muted); max-width:66ch;}
+  .note b{color:var(--ink); font-weight:500;}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <h1>Реплей матчу</h1>
+      <p class="sub">Іграшкова модель турнірного протоколу: тіки, дедлайни, перехоплення Наказом.</p>
+    </div>
+    <div class="meta">
+      <span>сід <b id="m-seed"></b></span>
+      <span>поле <b id="m-size"></b></span>
+      <span>тіків <b id="m-ticks"></b></span>
+    </div>
+  </header>
+
+  <div class="console">
+    <div class="board-cell"><canvas id="board" width="600" height="600"></canvas></div>
+
+    <div class="rail">
+      <div class="card lead" id="c-p1">
+        <div class="who"><span class="name" id="n-p1"></span><span class="score" id="s-p1">0</span></div>
+        <div class="row"><span>Наказ</span><span id="o-p1"></span></div>
+        <div class="row"><span>позиція</span><span id="xy-p1"></span></div>
+        <span class="pill" id="p-p1"><i></i><span></span></span>
+      </div>
+
+      <div class="card lead" id="c-p2">
+        <div class="who"><span class="name" id="n-p2"></span><span class="score" id="s-p2">0</span></div>
+        <div class="row"><span>Наказ</span><span id="o-p2"></span></div>
+        <div class="row"><span>позиція</span><span id="xy-p2"></span></div>
+        <span class="pill" id="p-p2"><i></i><span></span></span>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow">Позначення</p>
+        <div class="legend">
+          <div><span class="sw" style="background:var(--p1)"></span><span class="sw" style="background:var(--p2);margin-left:-4px"></span>бот на звʼязку, керує сам</div>
+          <div><span class="sw" style="background:var(--alert)"></span>гравцем керує Наказ</div>
+          <div><span class="sw res"></span>ресурс, +1 очко</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="track-block">
+    <p class="eyebrow">Хто керував на кожному тіку</p>
+    <div class="track" id="track" tabindex="0" role="slider" aria-label="Перемотування матчу" aria-valuemin="0">
+      <div class="lane" id="lane-p1"></div>
+      <div class="lane" id="lane-p2"></div>
+      <div class="head" id="head"></div>
+    </div>
+    <div class="ticks"><span>тік 0</span><span id="t-end"></span></div>
+
+    <div class="transport">
+      <button id="play">▶ Відтворити</button>
+      <button id="back">← крок</button>
+      <button id="fwd">крок →</button>
+      <select id="speed" aria-label="Швидкість">
+        <option value="2">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="0.5">2×</option>
+        <option value="0.25">4×</option>
+      </select>
+      <span class="tickno">тік <b id="t-now">0</b> / <span id="t-max"></span></span>
+    </div>
+  </div>
+
+  <p class="note" id="verdict"></p>
+</div>
+
+<script>
+const REPLAY = {
+  "seed": 7,
+  "config": {
+    "width": 11,
+    "height": 11,
+    "totalTicks": 80,
+    "resourceValue": 1,
+    "spawnEvery": 2,
+    "maxResources": 6,
+    "tickDeadlineMs": 80,
+    "minTickMs": 10
+  },
+  "seats": [
+    {
+      "id": "p1",
+      "name": "ТИ",
+      "order": "Робочий"
+    },
+    {
+      "id": "p2",
+      "name": "БАЗОВИЙ",
+      "order": "Жадібний"
+    }
+  ],
+  "frames": [
+    {
+      "tick": 0,
+      "players": [
+        {
+          "id": "p1",
+          "x": 1,
+          "y": 1,
+          "score": 0
+        },
+        {
+          "id": "p2",
+          "x": 9,
+          "y": 9,
+          "score": 0
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 1,
+      "players": [
+        {
+          "id": "p1",
+          "x": 0,
+          "y": 1,
+          "score": 0
+        },
+        {
+          "id": "p2",
+          "x": 9,
+          "y": 8,
+          "score": 0
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 0
+        },
+        {
+          "x": 10,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 2,
+      "players": [
+        {
+          "id": "p1",
+          "x": 0,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 10,
+          "y": 8,
+          "score": 0
+        }
+      ],
+      "resources": [
+        {
+          "x": 10,
+          "y": 7
+        },
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 10,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 3,
+      "players": [
+        {
+          "id": "p1",
+          "x": 1,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 10,
+          "y": 7,
+          "score": 1
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 10,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 4,
+      "players": [
+        {
+          "id": "p1",
+          "x": 2,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 10,
+          "y": 6,
+          "score": 1
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 7,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 5,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 10,
+          "y": 5,
+          "score": 1
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 7,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 6,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 10,
+          "y": 4,
+          "score": 1
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 2
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 7,
+      "players": [
+        {
+          "id": "p1",
+          "x": 5,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 10,
+          "y": 3,
+          "score": 2
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 2
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 8,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 9,
+          "y": 3,
+          "score": 2
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 9,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 9,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 0,
+          "score": 1
+        },
+        {
+          "id": "p2",
+          "x": 9,
+          "y": 2,
+          "score": 2
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 9,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 10,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 1,
+          "score": 2
+        },
+        {
+          "id": "p2",
+          "x": 9,
+          "y": 1,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 11,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 2,
+          "score": 2
+        },
+        {
+          "id": "p2",
+          "x": 8,
+          "y": 1,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 12,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 2,
+          "score": 2
+        },
+        {
+          "id": "p2",
+          "x": 7,
+          "y": 1,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 13,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 3,
+          "score": 2
+        },
+        {
+          "id": "p2",
+          "x": 7,
+          "y": 2,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 14,
+      "players": [
+        {
+          "id": "p1",
+          "x": 5,
+          "y": 3,
+          "score": 2
+        },
+        {
+          "id": "p2",
+          "x": 6,
+          "y": 2,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 5,
+          "y": 4
+        },
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 15,
+      "players": [
+        {
+          "id": "p1",
+          "x": 5,
+          "y": 4,
+          "score": 3
+        },
+        {
+          "id": "p2",
+          "x": 6,
+          "y": 3,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 16,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 4,
+          "score": 3
+        },
+        {
+          "id": "p2",
+          "x": 5,
+          "y": 3,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 17,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 5,
+          "score": 3
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 3,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 18,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 5,
+          "score": 3
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 3,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 6
+        },
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 1
+        },
+        {
+          "x": 0,
+          "y": 5
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 19,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 6,
+          "score": 4
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 3,
+          "score": 3
+        }
+      ],
+      "resources": [
+        {
+          "x": 2,
+          "y": 2
+        },
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 1
+        },
+        {
+          "x": 0,
+          "y": 5
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 20,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 7,
+          "score": 4
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 2,
+          "score": 4
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 1
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 21,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 8,
+          "score": 4
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 1,
+          "score": 5
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 22,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 8,
+          "score": 4
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 2,
+          "score": 5
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 4,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 23,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 9,
+          "score": 5
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 3,
+          "score": 5
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 24,
+      "players": [
+        {
+          "id": "p1",
+          "x": 5,
+          "y": 9,
+          "score": 5
+        },
+        {
+          "id": "p2",
+          "x": 1,
+          "y": 3,
+          "score": 5
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 25,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 9,
+          "score": 5
+        },
+        {
+          "id": "p2",
+          "x": 1,
+          "y": 4,
+          "score": 5
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 26,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 9,
+          "score": 5
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 4,
+          "score": 5
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 5
+        },
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 27,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 9,
+          "score": 5
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 5,
+          "score": 6
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 8,
+          "y": 8
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 28,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 8,
+          "score": 6
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 4,
+          "score": 6
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        },
+        {
+          "x": 2,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 29,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 7,
+          "score": 6
+        },
+        {
+          "id": "p2",
+          "x": 1,
+          "y": 4,
+          "score": 6
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        },
+        {
+          "x": 2,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 30,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 7,
+          "score": 6
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 4,
+          "score": 7
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        },
+        {
+          "x": 2,
+          "y": 7
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 31,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 4,
+          "score": 7
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        },
+        {
+          "x": 2,
+          "y": 7
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 32,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 4,
+          "score": 7
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 4,
+          "y": 5
+        },
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 33,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 5,
+          "score": 8
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 34,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 5,
+          "score": 8
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 35,
+      "players": [
+        {
+          "id": "p1",
+          "x": 5,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 6,
+          "score": 8
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 36,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 6,
+          "score": 8
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 2,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 1,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 37,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 6,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 7,
+          "score": 9
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 1,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 38,
+      "players": [
+        {
+          "id": "p1",
+          "x": 3,
+          "y": 7,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 8,
+          "score": 9
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 1,
+          "y": 10
+        },
+        {
+          "x": 6,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 39,
+      "players": [
+        {
+          "id": "p1",
+          "x": 4,
+          "y": 7,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 9,
+          "score": 9
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 1,
+          "y": 10
+        },
+        {
+          "x": 6,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 40,
+      "players": [
+        {
+          "id": "p1",
+          "x": 5,
+          "y": 7,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 1,
+          "y": 9,
+          "score": 9
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 1,
+          "y": 10
+        },
+        {
+          "x": 6,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 41,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 7,
+          "score": 7
+        },
+        {
+          "id": "p2",
+          "x": 1,
+          "y": 10,
+          "score": 10
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 6,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 42,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 6,
+          "score": 8
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 10,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 43,
+      "players": [
+        {
+          "id": "p1",
+          "x": 6,
+          "y": 7,
+          "score": 8
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 9,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 44,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 7,
+          "score": 8
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 8,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 8
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 45,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 7,
+          "score": 8
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 7,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 8
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 46,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 7,
+          "score": 8
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 6,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 8
+        },
+        {
+          "x": 8,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 47,
+      "players": [
+        {
+          "id": "p1",
+          "x": 10,
+          "y": 7,
+          "score": 8
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 5,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 8
+        },
+        {
+          "x": 8,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 48,
+      "players": [
+        {
+          "id": "p1",
+          "x": 10,
+          "y": 8,
+          "score": 9
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 4,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 49,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 8,
+          "score": 9
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 3,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 50,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 9,
+          "score": 10
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 2,
+          "score": 11
+        }
+      ],
+      "resources": [
+        {
+          "x": 0,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 10
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 51,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 10,
+          "score": 11
+        },
+        {
+          "id": "p2",
+          "x": 0,
+          "y": 1,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 52,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 10,
+          "score": 11
+        },
+        {
+          "id": "p2",
+          "x": 1,
+          "y": 1,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 53,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 9,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 1,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 54,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 8,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 1,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 2,
+          "y": 5
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 55,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 7,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 2,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 2,
+          "y": 5
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 56,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 6,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 3,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 2,
+          "y": 5
+        },
+        {
+          "x": 9,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 57,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 5,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 4,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 2,
+          "y": 5
+        },
+        {
+          "x": 9,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "order",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 58,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 4,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 4,
+          "score": 12
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 2,
+          "y": 5
+        },
+        {
+          "x": 9,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 59,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 4,
+          "score": 12
+        },
+        {
+          "id": "p2",
+          "x": 2,
+          "y": 5,
+          "score": 13
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 7,
+          "y": 3
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 9,
+          "y": 9
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 60,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 3,
+          "score": 13
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 5,
+          "score": 13
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 2
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 61,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 3,
+          "score": 13
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 5,
+          "score": 13
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 2
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 62,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 3,
+          "score": 13
+        },
+        {
+          "id": "p2",
+          "x": 5,
+          "y": 5,
+          "score": 13
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 3
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 63,
+      "players": [
+        {
+          "id": "p1",
+          "x": 10,
+          "y": 3,
+          "score": 14
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 5,
+          "score": 13
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 64,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 3,
+          "score": 14
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 5,
+          "score": 13
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 9,
+          "y": 2
+        },
+        {
+          "x": 3,
+          "y": 4
+        },
+        {
+          "x": 7,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 65,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 2,
+          "score": 15
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 4,
+          "score": 14
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 1
+        },
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 1
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 66,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 1,
+          "score": 16
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 4,
+          "score": 14
+        }
+      ],
+      "resources": [
+        {
+          "x": 10,
+          "y": 1
+        },
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 67,
+      "players": [
+        {
+          "id": "p1",
+          "x": 10,
+          "y": 1,
+          "score": 17
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 4,
+          "score": 14
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 3,
+          "y": 3
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 68,
+      "players": [
+        {
+          "id": "p1",
+          "x": 9,
+          "y": 1,
+          "score": 17
+        },
+        {
+          "id": "p2",
+          "x": 3,
+          "y": 3,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 0
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 69,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 1,
+          "score": 17
+        },
+        {
+          "id": "p2",
+          "x": 4,
+          "y": 3,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 7,
+          "y": 1
+        },
+        {
+          "x": 8,
+          "y": 0
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 70,
+      "players": [
+        {
+          "id": "p1",
+          "x": 7,
+          "y": 1,
+          "score": 18
+        },
+        {
+          "id": "p2",
+          "x": 5,
+          "y": 3,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 8,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 71,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 1,
+          "score": 18
+        },
+        {
+          "id": "p2",
+          "x": 6,
+          "y": 3,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 8,
+          "y": 0
+        },
+        {
+          "x": 0,
+          "y": 10
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 72,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 0,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 6,
+          "y": 2,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 73,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 1,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 6,
+          "y": 3,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 74,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 2,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 6,
+          "y": 4,
+          "score": 15
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 6
+        },
+        {
+          "x": 7,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 75,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 3,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 7,
+          "y": 4,
+          "score": 16
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 6
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 76,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 4,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 7,
+          "y": 5,
+          "score": 16
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 7
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 77,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 5,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 8,
+          "y": 5,
+          "score": 16
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 8,
+          "y": 6
+        },
+        {
+          "x": 0,
+          "y": 7
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 78,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 6,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 8,
+          "y": 6,
+          "score": 16
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    },
+    {
+      "tick": 79,
+      "players": [
+        {
+          "id": "p1",
+          "x": 8,
+          "y": 5,
+          "score": 19
+        },
+        {
+          "id": "p2",
+          "x": 8,
+          "y": 5,
+          "score": 16
+        }
+      ],
+      "resources": [
+        {
+          "x": 9,
+          "y": 9
+        },
+        {
+          "x": 0,
+          "y": 10
+        },
+        {
+          "x": 0,
+          "y": 7
+        },
+        {
+          "x": 9,
+          "y": 4
+        }
+      ],
+      "control": {
+        "p1": "live",
+        "p2": "live"
+      }
+    }
+  ],
+  "result": {
+    "scores": {
+      "p1": 19,
+      "p2": 16
+    },
+    "winner": "p1"
+  },
+  "stats": {
+    "p1": {
+      "liveTicks": 47,
+      "orderTicks": 33
+    },
+    "p2": {
+      "liveTicks": 80,
+      "orderTicks": 0
+    }
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+const cvs = $('board'), ctx = cvs.getContext('2d');
+const F = REPLAY.frames, LAST = F.length - 1, CFG = REPLAY.config;
+const [S1, S2] = REPLAY.seats;
+
+let i = Math.min(25, LAST);   // відкриваємось на тіку, де рветься зв'язок
+let playing = false, timer = null;
+
+$('m-seed').textContent = REPLAY.seed;
+$('m-size').textContent = CFG.width + '×' + CFG.height;
+$('m-ticks').textContent = CFG.totalTicks;
+$('t-max').textContent = LAST;
+$('t-end').textContent = 'тік ' + LAST;
+$('n-p1').textContent = S1.name;  $('n-p2').textContent = S2.name;
+$('o-p1').textContent = '«' + S1.order + '»';
+$('o-p2').textContent = '«' + S2.order + '»';
+$('c-p1').style.setProperty('--accent', 'var(--p1)');
+$('c-p2').style.setProperty('--accent', 'var(--p2)');
+$('track').setAttribute('aria-valuemax', LAST);
+
+/* --- доріжка керування: по клітинці на тік, видно кожен провал зв'язку --- */
+for (const [lane, sid] of [['lane-p1', S1.id], ['lane-p2', S2.id]]) {
+  $(lane).innerHTML = F.map((f) => {
+    const own = sid === S1.id ? 'var(--p1)' : 'var(--p2)';
+    const c = f.control[sid] === 'order' ? 'var(--alert)' : own;
+    return '<b style="--cell:' + c + '"></b>';
+  }).join('');
+}
+
+/* Кольори беремо з CSS-змінних, щоб канвас жив в обох темах. */
+let T = {};
+function readTheme() {
+  const s = getComputedStyle(document.documentElement);
+  T = Object.fromEntries(['--surface-2','--grid','--ink','--muted','--p1','--p2','--alert','--line']
+    .map((k) => [k, s.getPropertyValue(k).trim()]));
+}
+
+function draw() {
+  const f = F[i];
+  const n = CFG.width, dpr = Math.min(devicePixelRatio || 1, 2);
+  const css = cvs.clientWidth || 600;
+  if (cvs.width !== Math.round(css * dpr)) {
+    cvs.width = Math.round(css * dpr);
+    cvs.height = Math.round(css * dpr);
+  }
+  const S = cvs.width, cell = S / n;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, S, S);
+
+  ctx.fillStyle = T['--surface-2']; ctx.fillRect(0, 0, S, S);
+  ctx.strokeStyle = T['--grid']; ctx.lineWidth = Math.max(1, dpr);
+  for (let k = 1; k < n; k++) {
+    const p = Math.round(k * cell) + .5;
+    ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, S);
+    ctx.moveTo(0, p); ctx.lineTo(S, p); ctx.stroke();
+  }
+
+  // ресурси — порожні ромби, щоб не сперечались за увагу з гравцями
+  ctx.strokeStyle = T['--muted']; ctx.lineWidth = Math.max(1.6, dpr * 1.4);
+  for (const r of f.resources) {
+    const cx = (r.x + .5) * cell, cy = (r.y + .5) * cell, s = cell * .21;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s, cy); ctx.lineTo(cx, cy + s); ctx.lineTo(cx - s, cy);
+    ctx.closePath(); ctx.stroke();
+  }
+
+  // гравці; той, ким керує Наказ, перемикається на колір тривоги
+  for (const p of f.players) {
+    const own = p.id === S1.id ? T['--p1'] : T['--p2'];
+    const underOrder = f.control[p.id] === 'order';
+    const x = p.x * cell, y = p.y * cell, pad = cell * .16, r = cell * .2;
+    ctx.fillStyle = underOrder ? T['--alert'] : own;
+    ctx.beginPath();
+    ctx.roundRect(x + pad, y + pad, cell - pad * 2, cell - pad * 2, r);
+    ctx.fill();
+    if (underOrder) {                     // пунктирна обводка = «керує не бот»
+      ctx.strokeStyle = own; ctx.lineWidth = Math.max(2, dpr * 1.8);
+      ctx.setLineDash([cell * .12, cell * .1]);
+      ctx.stroke(); ctx.setLineDash([]);
+    }
+    ctx.fillStyle = T['--surface-2'];
+    ctx.font = '600 ' + Math.round(cell * .42) + 'px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(p.id === S1.id ? '1' : '2', x + cell / 2, y + cell / 2 + cell * .02);
+  }
+  paintRail(f);
+}
+
+function paintRail(f) {
+  for (const [seat, sfx] of [[S1, 'p1'], [S2, 'p2']]) {
+    const p = f.players.find((q) => q.id === seat.id);
+    $('s-' + sfx).textContent = p.score;
+    $('xy-' + sfx).textContent = p.x + ', ' + p.y;
+    const order = f.control[seat.id] === 'order';
+    const pill = $('p-' + sfx);
+    pill.classList.toggle('order', order);
+    pill.lastElementChild.textContent = order ? 'керує Наказ' : 'на звʼязку';
+  }
+  $('t-now').textContent = f.tick;
+  $('head').style.left = ((i + .5) / F.length * 100) + '%';
+  $('track').setAttribute('aria-valuenow', f.tick);
+}
+
+const go = (n) => { i = Math.max(0, Math.min(LAST, n)); draw(); };
+
+function stop() {
+  playing = false; clearInterval(timer); timer = null;
+  $('play').textContent = '▶ Відтворити';
+}
+function start() {
+  if (i >= LAST) i = 0;
+  playing = true;
+  $('play').textContent = '❚❚ Пауза';
+  clearInterval(timer);
+  timer = setInterval(() => {
+    if (i >= LAST) return stop();
+    go(i + 1);
+  }, 110 * Number($('speed').value));
+}
+
+$('play').onclick = () => (playing ? stop() : start());
+$('back').onclick = () => { stop(); go(i - 1); };
+$('fwd').onclick  = () => { stop(); go(i + 1); };
+$('speed').onchange = () => { if (playing) start(); };
+
+const scrub = (e) => {
+  const r = $('track').getBoundingClientRect();
+  go(Math.round(((e.clientX - r.left) / r.width) * LAST));
+};
+$('track').addEventListener('pointerdown', (e) => {
+  stop(); $('track').setPointerCapture(e.pointerId); scrub(e);
+});
+$('track').addEventListener('pointermove', (e) => {
+  if ($('track').hasPointerCapture(e.pointerId)) scrub(e);
+});
+$('track').addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft')  { stop(); go(i - 1); e.preventDefault(); }
+  if (e.key === 'ArrowRight') { stop(); go(i + 1); e.preventDefault(); }
+});
+addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'SELECT' || e.target.id === 'track') return;
+  if (e.code === 'Space') { e.preventDefault(); playing ? stop() : start(); }
+  if (e.key === 'ArrowLeft')  { stop(); go(i - 1); }
+  if (e.key === 'ArrowRight') { stop(); go(i + 1); }
+});
+
+const plural = (n, one, few, many) => {
+  const a = n % 10, b = n % 100;
+  if (a === 1 && b !== 11) return one;
+  if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return few;
+  return many;
+};
+
+const w = REPLAY.result.winner;
+const st = REPLAY.stats;
+const wn = w ? REPLAY.seats.find((s) => s.id === w).name : null;
+$('verdict').innerHTML =
+  (wn ? '<b>Переміг ' + wn + '.</b> ' : '<b>Нічия.</b> ') +
+  'Рахунок ' + REPLAY.result.scores[S1.id] + ':' + REPLAY.result.scores[S2.id] + '. ' +
+  S1.name + ' провів <b>' + st[S1.id].orderTicks + ' ' + plural(st[S1.id].orderTicks, 'тік', 'тіки', 'тіків') + '</b> без звʼязку — весь цей час на полі ним керував не бот, ' +
+  'а Наказ «' + S1.order + '». Червона смуга на доріжці — рівно цей провал.';
+
+const mq = matchMedia('(prefers-color-scheme: dark)');
+mq.addEventListener('change', () => { readTheme(); draw(); });
+new MutationObserver(() => { readTheme(); draw(); })
+  .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+addEventListener('resize', draw);
+if (document.fonts) document.fonts.ready.then(draw);
+
+readTheme();
+draw();
+</script>
+
+</body>
+</html>

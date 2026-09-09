@@ -1,0 +1,18 @@
+{
+  "name": "zoria-sandbox",
+  "private": true,
+  "type": "module",
+  "description": "Іграшкова модель турніру ZORIA: движок-суддя, WebSocket-протокол, Накази та реплей.",
+  "scripts": {
+    "match": "node --experimental-strip-types src/run-match.ts",
+    "drop": "node --experimental-strip-types src/run-match.ts --seed 7 --drop 25:40",
+    "arena": "node --experimental-strip-types src/arena.ts",
+    "viewer": "node --experimental-strip-types src/build-viewer.ts",
+    "orders": "node --experimental-strip-types src/arena-orders.ts",
+    "tune": "node --experimental-strip-types src/tune.ts"
+  },
+  "dependencies": {
+    "ws": "^8.18.0",
+    "yaml": "^2.6.0"
+  }
+}
