@@ -1,5 +1,5 @@
 <h1 align="center">
-  Hi! I'm <a href="https://www.linkedin.com/in/oleh-chernov-9ab27a262/" target="_blank">Oleh Chernov</a> 👋
+  Hi! I'm <a href="https://www.linkedin.com/in/olehchernov/" target="_blank">Oleh Chernov</a> 👋
 </h1>
 
 <p align="center">
@@ -23,7 +23,7 @@ next-intl (UA/EN), Zustand cart. [Live demo](https://hrust-iota.vercel.app)
 
 ## 🌐 Socials:
 <p>
-  <a href="https://www.linkedin.com/in/oleh-chernov-9ab27a262/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
+  <a href="https://www.linkedin.com/in/olehchernov/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>
   <a href="https://t.me/nineuito"><img src="https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" /></a>
   <a href="mailto:oleh.chernov.fs@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" /></a>
   <a href="https://gitlab.com/oleh.chernov.fs"><img src="https://img.shields.io/badge/GitLab-FC6D26?style=for-the-badge&logo=gitlab&logoColor=white" /></a>
