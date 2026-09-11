@@ -77,6 +77,5 @@ next-intl (UA/EN), Zustand cart. [Live demo](https://hrust-iota.vercel.app)
 ---
 
 <p align="center">
-  <b>Open to Full-Stack roles · Remote (EU / US)</b><br>
   <a href="mailto:oleh.chernov.fs@gmail.com">oleh.chernov.fs@gmail.com</a>
 </p>
